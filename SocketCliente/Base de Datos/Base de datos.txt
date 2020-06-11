@@ -1,0 +1,50 @@
+drop database reportetecnico;
+
+create database reportetecnico;
+
+\c reportetecnico
+
+create type parcial as enum('1','2','3');
+
+CREATE SEQUENCE matriculaInd INCREMENT +1 
+MINVALUE 100 MAXVALUE 999999 START 10000 CYCLE;
+
+create table admin(matricula bigint primary key,
+nombre varchar(30), ap_pat varchar(25), ap_mat varchar(25),
+password varchar(20), telefono bigint, correo varchar(50));
+
+create table asesorInd(id_asesorInd serial primary key, nombre varchar(30),
+ap_pat varchar(25), ap_mat varchar(25), empresa varchar(35), correo varchar(50),
+telefono bigint, password varchar(20));
+
+create table asesorAca(matricula bigint primary key, nombre varchar(30), 
+ap_pat varchar(25), ap_mat varchar(25), correo varchar(50), telefono bigint, password varchar(20));
+
+
+create table alumno(matricula bigint primary key, nombre varchar(30),
+ap_pat varchar(25), ap_mat varchar(25), password varchar(20), 
+telefono bigint, correo varchar(50), proyecto varchar(50), division varchar(5),carrera text, periodoCuatrimestral varchar(80),
+id_asesorInd serial, foreign key(id_asesorInd) references asesorInd(id_asesorInd),
+id_asesorAca bigint, foreign key(id_asesorAca) references asesorAca(matricula));
+
+create table avancesAlumno(id_avance serial, matriculaAlumno bigint,
+foreign key(matriculaAlumno) references alumno(matricula), noSemana int, avance text, primary key(matriculaAlumno, noSemana));
+
+create table observacionesInd(id_observacionInd serial,matriculaAlumno bigint,
+foreign key(matriculaAlumno) references alumno(matricula), id_asesorInd serial,
+foreign key(id_asesorInd) references asesorInd(id_asesorInd),
+noSemana int, observacionInd text, primary key(id_asesorInd, noSemana));
+
+create table observacionesAca(id_observacionAca serial, matriculaAlumno bigint,
+foreign key(matriculaAlumno) references alumno(matricula), 
+id_asesorAca bigint, foreign key(id_asesorAca) references asesorAca(matricula), noSemana int, observacionAca text, primary key(id_asesorAca, noSemana));
+
+create table evaluacionAca( id_evaluacionAca serial, 
+matriculaAlumno bigint, foreign key(matriculaAlumno) references alumno(matricula), 
+id_asesorAca bigint, foreign key(id_asesorAca) references asesorAca(matricula),
+parcial parcial, saber int, hacer int, ser int, primary key(matriculaAlumno, parcial));
+
+create table evaluacionInd (id_evaluacionInd serial, 
+matriculaAlumno bigint, foreign key(matriculaAlumno) references alumno(matricula), 
+id_asesorInd serial, foreign key(id_asesorInd) references asesorInd(id_asesorInd),
+parcial parcial, saber int, hacer int, ser int, primary key(matriculaAlumno, parcial));
